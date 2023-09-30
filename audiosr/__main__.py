@@ -85,12 +85,12 @@ parser.add_argument(
     type=str,
     required=False,
     help="Suffix for the output file",
-    default="_AudioSR_Processed_48K",
+    default="",
 )
 
 args = parser.parse_args()
 torch.set_float32_matmul_precision("high")
-save_path = os.path.join(args.save_path, get_time())
+save_path = args.save_path
 
 assert args.input_file_list is not None or args.input_audio_file is not None,"Please provide either a list of audio files or a single audio file"
 
