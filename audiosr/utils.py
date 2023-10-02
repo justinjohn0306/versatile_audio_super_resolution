@@ -189,11 +189,13 @@ def read_wav_file(filename):
     waveform, sr = torchaudio.load(filename)
     duration = waveform.size(-1) / sr
 
-    if(duration > 10.24):
-        print("\033[93m {}\033[00m" .format("Warning: audio is longer than 10.24 seconds, may degrade the model performance. It's recommand to truncate your audio to 5.12 seconds before input to AudioSR to get the best performance."))
-
-    if(duration % 5.12 != 0):
-        pad_duration = duration + (5.12 - duration % 5.12)
+    if duration < 5.12:
+        # If the duration is less than 5.12 seconds, pad it to 5.12 seconds
+        pad_duration = 5.12
+        target_length = int(48000 * pad_duration)
+        
+        # Pad the waveform with zeros
+        waveform = torch.cat([waveform, torch.zeros(1, target_length - waveform.size(-1))], dim=-1)
     else:
         pad_duration = duration
 
@@ -203,9 +205,7 @@ def read_wav_file(filename):
 
     waveform = waveform.numpy()[0, ...]
 
-    waveform = normalize_wav(
-        waveform
-    )  # TODO rescaling the waveform will cause low LSD score
+    waveform = normalize_wav(waveform)
 
     waveform = waveform[None, ...]
     waveform = pad_wav(waveform, target_length=int(48000 * pad_duration))
