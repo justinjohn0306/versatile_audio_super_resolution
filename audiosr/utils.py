@@ -59,11 +59,17 @@ def pad_wav(waveform, target_length):
     if waveform_length == target_length:
         return waveform
 
-    # Pad
+    # Pad or Trim
     temp_wav = np.zeros((1, target_length), dtype=np.float32)
     rand_start = 0
 
-    temp_wav[:, rand_start : rand_start + waveform_length] = waveform
+    if waveform_length > target_length:
+        # Trim
+        temp_wav = waveform[:, :target_length]
+    else:
+        # Pad
+        temp_wav[:, rand_start : rand_start + waveform_length] = waveform
+
     return temp_wav
 
 
